@@ -7,18 +7,18 @@ const ExpenseList = DB.collection("expenses");
 const ExpensesList = () => {
   const [expenses, setExpenses] = useState([]);
 
-  useEffect(() => {
-    const unsubscribe = ExpenseList.limit(100).onSnapshot((querySnapshot) => {
-      const data = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      console.log(data, typeof data);
-      console.log(ExpenseList);
-      setExpenses(data);
-    });
-    return unsubscribe;
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = ExpenseList.limit(100).onSnapshot((querySnapshot) => {
+  //     const data = querySnapshot.docs.map((doc) => ({
+  //       ...doc.data(),
+  //       id: doc.id,
+  //     }));
+  //     console.log(data, typeof data);
+  //     console.log(ExpenseList);
+  //     setExpenses(data);
+  //   });
+  //   return unsubscribe;
+  // }, []);
 
   return (
     <div>
