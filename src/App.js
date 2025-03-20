@@ -8,7 +8,7 @@ import ExpensesList from "./components/ExpensesList";
 function App() {
   return (
     <div className="App">
-      <header>Split Bills Apps</header>
+      <header>Split Bills App</header>
       <Members />
       <Expenses />
       <ExpensesList />
