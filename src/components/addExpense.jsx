@@ -1,9 +1,10 @@
 import fb from "./firebase.js";
 import React, { useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
 import "../css/addExpense.css";
-const DB = fb.firestore();
 
-const ExpenseList = DB.collection("expenses");
+const db = fb.firestore();
+const ExpensesListdb = collection(db, "expenses");
 
 const AddExpense = () => {
   const [expense, setExpense] = useState("");
@@ -12,20 +13,15 @@ const AddExpense = () => {
   const [endDate, setEndDate] = useState("");
   const [payers, setPayers] = useState("");
 
-  const submit = (e) => {
+  const saveDataToFirestore = async (e) => {
     e.preventDefault();
-    ExpenseList.add({
+    const docRef = await addDoc(ExpensesListdb, {
       Expense: expense,
       Amount: amount,
       StartDate: startDate,
       EndDate: endDate,
-    })
-      .then((docRef) => {
-        alert("data successfully submitted");
-      })
-      .catch((error) => {
-        console.error("error:", error);
-      });
+    });
+    alert("Document written to Database");
   };
 
   return (
@@ -33,8 +29,8 @@ const AddExpense = () => {
       <h6>Add expense</h6>
       <form
         className="expense-form"
-        onSubmit={(event) => {
-          submit(event);
+        onSubmit={(e) => {
+          saveDataToFirestore(e);
           console.log("submitted");
         }}
       >
