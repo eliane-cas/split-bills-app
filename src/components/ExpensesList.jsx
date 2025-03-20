@@ -1,5 +1,5 @@
 import fb from "./firebase";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { getDocs, collection } from "firebase/firestore";
 
 const db = fb.firestore();
@@ -26,6 +26,9 @@ const ExpensesList = () => {
           <div key={index}>
             <li>Expense: {item.Expense}</li>
             <li>Amount: {item.Amount}</li>
+            {item.StartDate && <li>Bill start date: {item.StartDate}</li>}
+            {item.EndDate && <li>Bill end date: {item.EndDate}</li>}
+            {!item.StartDate && !item.EndDate && <p>bill with no time!</p>}
             <hr></hr>
           </div>
         ))}

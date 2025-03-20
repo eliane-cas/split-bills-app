@@ -1,11 +1,13 @@
 import React from "react";
-import Member from "./Member";
+import AddMember from "./AddMember";
+import MembersList from "./MembersList";
 
 const Members = () => {
   return (
     <div>
-      Members
-      <Member />
+      Members <br />
+      <AddMember />
+      <MembersList />
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import React from "react";
+import AddExpense from "./addExpense";
+import ExpensesList from "./ExpensesList";
 
 const Expenses = () => {
   const expenses = [100, 75, 43, 500];
@@ -6,11 +8,8 @@ const Expenses = () => {
   return (
     <div>
       Expenses
-      <ul>
-        {expenses.map((expense) => {
-          <li>{expense}</li>;
-        })}
-      </ul>
+      <AddExpense />
+      <ExpensesList />
     </div>
   );
 };
