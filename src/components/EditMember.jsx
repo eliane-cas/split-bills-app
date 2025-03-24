@@ -6,10 +6,10 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 const db = fb.firestore();
 
 function EditMember() {
-  let [storedMember, setStoredMember] = useState([]);
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
   const navigate = useNavigate();
 
   const { firebaseId } = useParams();
@@ -18,12 +18,18 @@ function EditMember() {
     const fetchMemberFromFirestore = async () => {
       const querySnapshot = await getDoc(doc(db, "members", firebaseId));
 
-      setStoredMember(querySnapshot.data());
+      const targetObject = querySnapshot.data();
+      console.log("target object", targetObject);
+
+      setName(targetObject.Name);
+      setStartDate(targetObject.StartDate);
+      setEndDate(targetObject.EndDate);
     };
     fetchMemberFromFirestore();
   }, [firebaseId]);
 
-  const updateData = async () => {
+  const updateData = async (e) => {
+    e.preventDefault();
     await updateDoc(doc(db, "members", firebaseId), {
       Name: name,
       StartDate: startDate,
@@ -35,10 +41,15 @@ function EditMember() {
   return (
     <>
       <h6>Edit member</h6>
-      <form className="expense-form">
+      <form
+        className="expense-form"
+        onSubmit={(e) => {
+          updateData(e);
+        }}
+      >
         <input
           type="text"
-          value={storedMember.Name}
+          value={name}
           onChange={(e) => {
             setName(e.target.value);
           }}
@@ -46,8 +57,8 @@ function EditMember() {
         <label for="startDate">Entered flat on:</label>
         <input
           type="date"
-          value={storedMember.StartDate}
           id="startDate"
+          value={startDate}
           onChange={(e) => {
             setStartDate(e.target.value);
           }}
@@ -56,14 +67,12 @@ function EditMember() {
         <input
           type="date"
           id="endDate"
-          value={storedMember.EndDate}
+          value={endDate}
           onChange={(e) => {
             setEndDate(e.target.value);
           }}
         />
-        <button onClick={updateData} type="submit">
-          Update member
-        </button>
+        <button type="submit">Update member</button>
         <button onClick={() => navigate("/")}>go to homepage</button>
       </form>
     </>

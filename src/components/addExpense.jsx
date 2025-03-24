@@ -40,6 +40,15 @@ const AddExpense = () => {
     alert("Document written to Database");
   };
 
+  const handleCheckboxChange = (event) => {
+    const checkedId = event.target.value;
+    if (event.target.checked) {
+      setPayers([...payers, checkedId]);
+    } else {
+      setPayers([payers.filter((id) => id !== checkedId)]);
+    }
+  };
+
   return (
     <div>
       <h6>Add expense</h6>
@@ -92,8 +101,8 @@ const AddExpense = () => {
                 id={member.Name}
                 name={member.Name}
                 value={member.Name}
-                onChange={(e) => {
-                  setPayers(e.target.value);
+                onChange={(event) => {
+                  handleCheckboxChange(event);
                 }}
               ></input>
               <label for={member.Name}>{member.Name}</label>

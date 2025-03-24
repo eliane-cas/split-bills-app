@@ -1,31 +1,45 @@
 import fb from "./firebase";
 import React, { useState, useEffect } from "react";
-import {
-  getDocs,
-  collection,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 
 const db = fb.firestore();
-const ExpensesListdb = collection(db, "expenses");
 
 function EditExpense() {
-  const [storedExpenses, setStoredExpenses] = useState([]);
+  const [expense, setExpense] = useState("");
+  const [amount, setAmount] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [payers, setPayers] = useState([]);
 
-  const fetchDataFromFirestore = async () => {
-    const querySnapshot = await getDocs(ExpensesListdb);
-    const temporaryArr = [];
-    querySnapshot.forEach((doc) => {
-      let tempObj = doc.data();
-      tempObj.docId = doc.id;
-      temporaryArr.push(tempObj);
+  const navigate = useNavigate();
+
+  const { firebaseId } = useParams();
+
+  useEffect(() => {
+    const fetchExpenseFromFirestore = async () => {
+      const querySnapshot = await getDoc(doc(db, "expenses", firebaseId));
+
+      const targetObject = querySnapshot.data();
+      console.log("target object", targetObject);
+      setExpense(targetObject.Expense);
+      setAmount(targetObject.Amount);
+      setStartDate(targetObject.StartDate);
+      setEndDate(targetObject.EndDate);
+    };
+    fetchExpenseFromFirestore();
+  }, [firebaseId]);
+
+  const updateData = async (e) => {
+    e.preventDefault();
+    await updateDoc(doc(db, "expenses", firebaseId), {
+      Expense: expense,
+      Amount: amount,
+      StartDate: startDate,
+      EndDate: endDate,
     });
-    setStoredExpenses(temporaryArr);
+    alert("expense updated in the database");
   };
-  fetchDataFromFirestore();
 
   return (
     <div>
@@ -35,46 +49,48 @@ function EditExpense() {
         <form
           className="expense-form"
           onSubmit={(e) => {
-            // saveDataToFirestore(e);
-            console.log("submitted");
+            updateData(e);
           }}
         >
           <input
             type="text"
-            placeholder="Expense"
+            value={expense}
             onChange={(e) => {
-              //   setExpense(e.target.value);
+              setExpense(e.target.value);
             }}
             required
           />
           <input
             type="number"
-            placeholder="Amount"
+            value={amount}
             onChange={(e) => {
-              //   setAmount(e.target.value);
+              setAmount(e.target.value);
             }}
             required
           />
           <label for="startDate">Start Date:</label>
           <input
             type="date"
+            value={startDate}
             id="startDate"
             name="start date"
             onChange={(e) => {
-              //   setStartDate(e.target.value);
+              setStartDate(e.target.value);
             }}
           />
           <label for="endDate">End Date:</label>
           <input
             type="date"
             id="endDate"
+            value={endDate}
             name="end date"
             onChange={(e) => {
-              //   setEndDate(e.target.value);
+              setEndDate(e.target.value);
             }}
           />
 
           <button type="submit">Update this Expense</button>
+          <button onClick={() => navigate("/")}>go to homepage</button>
         </form>
       </div>
     </div>

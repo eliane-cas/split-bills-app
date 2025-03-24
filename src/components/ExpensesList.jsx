@@ -18,10 +18,13 @@ const ExpensesList = () => {
       let tempObj = doc.data();
       tempObj.docId = doc.id;
       temporaryArr.push(tempObj);
+      // console.log(doc.id);
     });
     setStoredExpenses(temporaryArr);
   };
   fetchDataFromFirestore();
+
+  // console.log(storedExpenses);
 
   const deleteNumber = async (item) => {
     await deleteDoc(doc(db, "expenses", item.docId));
@@ -38,6 +41,7 @@ const ExpensesList = () => {
             {item.StartDate && <li>Bill start date: {item.StartDate}</li>}
             {item.EndDate && <li>Bill end date: {item.EndDate}</li>}
             {!item.StartDate && !item.EndDate && <p>bill with no time!</p>}
+            <li>split bill between: {item.Payers.join(" and ")}</li>
             <button onClick={() => navigate(`/editexpense/${item.docId}`)}>
               edit
             </button>
