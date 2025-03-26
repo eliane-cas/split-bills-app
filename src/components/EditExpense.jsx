@@ -26,10 +26,11 @@ function EditExpense() {
       setAmount(targetObject.Amount);
       setStartDate(targetObject.StartDate);
       setEndDate(targetObject.EndDate);
+      setPayers(targetObject.Payers);
     };
     fetchExpenseFromFirestore();
   }, [firebaseId]);
-
+  console.log(payers);
   const updateData = async (e) => {
     e.preventDefault();
     await updateDoc(doc(db, "expenses", firebaseId), {
@@ -88,6 +89,12 @@ function EditExpense() {
               setEndDate(e.target.value);
             }}
           />
+
+          <div>
+            {payers.map((payer, index) => (
+              <div key={index}></div>
+            ))}
+          </div>
 
           <button type="submit">Update this Expense</button>
           <button onClick={() => navigate("/")}>go to homepage</button>

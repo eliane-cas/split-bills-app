@@ -1,6 +1,12 @@
 import fb from "./firebase.js";
 import React, { useState } from "react";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {
+  doc,
+  addDoc,
+  collection,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import "../css/addExpense.css";
 
 const db = fb.firestore();
@@ -21,11 +27,15 @@ const AddExpense = () => {
     const querySnapshot = await getDocs(MembersListdb);
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
-      temporaryArr.push(doc.data());
+      let tempObj = doc.data();
+      tempObj.docId = doc.id;
+      temporaryArr.push(tempObj);
     });
     setStoredMembers(temporaryArr);
   };
   fetchDataFromFirestore();
+
+  // console.log(storedMembers);
 
   // save expense data to firestore
   const saveDataToFirestore = async (e) => {
@@ -38,6 +48,19 @@ const AddExpense = () => {
       Payers: payers,
     });
     alert("Document written to Database");
+
+    // splitting the bill
+    storedMembers.forEach(async (member) => {
+      if (payers.includes(member.Name)) {
+        console.log(amount / payers.length, member.Name);
+        member.Bills = [...member.Bills, amount / payers.length];
+
+        await updateDoc(doc(db, "members", member.docId), {
+          Bills: member.Bills,
+        });
+        console.log(member.Bills);
+      }
+    });
   };
 
   const handleCheckboxChange = (event) => {
