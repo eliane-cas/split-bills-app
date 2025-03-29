@@ -26,7 +26,7 @@ const Split = () => {
   return (
     <div>
       Split
-      {storedMembers.map((item, index) => (
+      {/* {storedMembers.map((item, index) => (
         <div key={index}>
           <p>{item.Name}</p>
           <p>Owes:</p>
@@ -36,12 +36,13 @@ const Split = () => {
           <div>
             Total:{" "}
             {item.Bills.reduce(
-              (accumulator, currentValue) => accumulator + currentValue
+              (accumulator, currentValue) => accumulator + currentValue,
+              0
             )}
             €
           </div>
         </div>
-      ))}
+      ))} */}
       <SplittingFunction />
     </div>
   );

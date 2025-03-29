@@ -47,13 +47,22 @@ const AddExpense = () => {
       EndDate: endDate,
       Payers: payers,
     });
+    console.log(docRef.id);
+
     alert("Document written to Database");
 
     // splitting the bill
     storedMembers.forEach(async (member) => {
       if (payers.includes(member.Name)) {
         console.log(amount / payers.length, member.Name);
-        member.Bills = [...member.Bills, amount / payers.length];
+        member.Bills = [
+          ...member.Bills,
+          {
+            billId: docRef.id,
+            totalamount: amount,
+            share: amount / payers.length,
+          },
+        ];
 
         await updateDoc(doc(db, "members", member.docId), {
           Bills: member.Bills,
