@@ -17,6 +17,7 @@ const AddMember = () => {
       StartDate: startDate,
       EndDate: endDate,
       Bills: [],
+      Paid: [],
     });
     alert("member added to the database");
   };
@@ -31,6 +32,7 @@ const AddMember = () => {
         }}
       >
         <input
+          required
           type="text"
           placeholder="User name"
           onChange={(e) => {
@@ -39,6 +41,7 @@ const AddMember = () => {
         />
         <label for="startDate">Entered flat on:</label>
         <input
+          required
           type="date"
           id="startDate"
           name="start date"

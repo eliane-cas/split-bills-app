@@ -19,6 +19,7 @@ const AddExpense = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [payers, setPayers] = useState([]);
+  const [payer, setPayer] = useState("");
 
   // get members from database
   const [storedMembers, setStoredMembers] = useState([]);
@@ -28,7 +29,7 @@ const AddExpense = () => {
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
       let tempObj = doc.data();
-      tempObj.docId = doc.id;
+      tempObj.MemberId = doc.id;
       temporaryArr.push(tempObj);
     });
     setStoredMembers(temporaryArr);
@@ -46,8 +47,10 @@ const AddExpense = () => {
       StartDate: startDate,
       EndDate: endDate,
       Payers: payers,
+      Payer: payer,
     });
     console.log(docRef.id);
+    console.log(payer);
 
     alert("Document written to Database");
 
@@ -64,7 +67,7 @@ const AddExpense = () => {
           },
         ];
 
-        await updateDoc(doc(db, "members", member.docId), {
+        await updateDoc(doc(db, "members", member.MemberId), {
           Bills: member.Bills,
         });
         console.log(member.Bills);
@@ -126,6 +129,27 @@ const AddExpense = () => {
           }}
         />
         <div>
+          Who paid?
+          {storedMembers.map((member, index) => (
+            <div key={index}>
+              <input
+                type="radio"
+                id={member.Name}
+                name="who paid"
+                value={member.Name}
+                onChange={(event) => {
+                  setPayer(event.target.value);
+                }}
+              />
+              <label for={member.Name}>
+                {member.MemberId}
+                {member.Name}
+              </label>
+            </div>
+          ))}
+        </div>
+        <div>
+          Split between who?
           {storedMembers.map((member, index) => (
             <div key={index}>
               <input
