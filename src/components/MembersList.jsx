@@ -11,7 +11,8 @@ function MembersList() {
 
   const navigate = useNavigate();
 
-  const fetchDataFromFirestore = async () => {
+  // put inside a use effect to not endelessly fetch the data from firestore ==>
+  const fetchMembersFromFirestore = async () => {
     const querySnapshot = await getDocs(MembersListdb);
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
@@ -21,7 +22,7 @@ function MembersList() {
     });
     setStoredMembers(temporaryArr);
   };
-  fetchDataFromFirestore();
+  fetchMembersFromFirestore();
 
   const deleteMember = async (item) => {
     await deleteDoc(doc(db, "members", item.docId));

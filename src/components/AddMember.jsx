@@ -16,7 +16,7 @@ const AddMember = () => {
       Name: name,
       StartDate: startDate,
       EndDate: endDate,
-      Bills: [],
+
       Paid: [],
     });
     alert("member added to the database");

@@ -16,21 +16,25 @@ const Split = () => {
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
       let tempObj = doc.data();
-      tempObj.docId = doc.id;
+      tempObj.MemberId = doc.id;
       temporaryArr.push(tempObj);
     });
     setStoredMembers(temporaryArr);
   };
   fetchDataFromFirestore();
 
+  // console.log("split", storedMembers);
+
+  // console.log("stored Expenses", typeof storedExpenses);
+
   return (
     <div>
       Split
-      {/* {storedMembers.map((item, index) => (
+      {storedMembers.map((item, index) => (
         <div key={index}>
           <p>{item.Name}</p>
           <p>Owes:</p>
-          {item.Bills.map((bill, index) => (
+          {/* {item.Bills.map((bill, index) => (
             <div key={index}>{bill}€</div>
           ))}
           <div>
@@ -40,9 +44,9 @@ const Split = () => {
               0
             )}
             €
-          </div>
+          </div> */}
         </div>
-      ))} */}
+      ))}
       <SplittingFunction />
     </div>
   );
