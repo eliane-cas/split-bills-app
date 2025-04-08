@@ -39,7 +39,7 @@ function MembersList() {
             <li>Entered flat on: {item.StartDate}</li>
             {item.EndDate && <li>Left flat on: {item.EndDate}</li>}
             {!item.EndDate && <li>Still lives in flat!</li>}
-            <li>Bills paid by this member: {item.Paid}</li>
+
             <button onClick={() => navigate(`/editmember/${item.docId}`)}>
               edit
             </button>

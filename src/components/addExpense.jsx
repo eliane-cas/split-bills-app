@@ -142,7 +142,6 @@ const AddExpense = () => {
           {storedMembers.map((member, index) => (
             <div key={index}>
               <input
-                required
                 type="checkbox"
                 id={member.Name}
                 name={member.Name}

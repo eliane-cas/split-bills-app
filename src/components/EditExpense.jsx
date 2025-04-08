@@ -22,6 +22,7 @@ function EditExpense() {
 
       const targetObject = querySnapshot.data();
       console.log("target object", targetObject);
+
       setExpense(targetObject.Expense);
       setAmount(targetObject.Amount);
       setStartDate(targetObject.StartDate);
@@ -30,7 +31,9 @@ function EditExpense() {
     };
     fetchExpenseFromFirestore();
   }, [firebaseId]);
+
   console.log(payers);
+
   const updateData = async (e) => {
     e.preventDefault();
     await updateDoc(doc(db, "expenses", firebaseId), {

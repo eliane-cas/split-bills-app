@@ -74,7 +74,7 @@ const ExpensesList = () => {
             {!item.StartDate && !item.EndDate && <li>Bill with no time!</li>}
             <li>Bill paid by {item.Payer}</li>
             <li>Split bill between: {item.Payers.join(" and ")}</li>
-            <button onClick={() => navigate(`/editexpense/${item.docId}`)}>
+            <button onClick={() => navigate(`/editexpense/${item.expenseId}`)}>
               edit
             </button>
             <button onClick={() => deleteNumber(item)}>delete</button>
