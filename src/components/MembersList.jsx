@@ -11,7 +11,8 @@ function MembersList() {
 
   const navigate = useNavigate();
 
-  const fetchDataFromFirestore = async () => {
+  // put inside a use effect to not endelessly fetch the data from firestore ==>
+  const fetchMembersFromFirestore = async () => {
     const querySnapshot = await getDocs(MembersListdb);
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
@@ -21,7 +22,7 @@ function MembersList() {
     });
     setStoredMembers(temporaryArr);
   };
-  fetchDataFromFirestore();
+  fetchMembersFromFirestore();
 
   const deleteMember = async (item) => {
     await deleteDoc(doc(db, "members", item.docId));
@@ -38,7 +39,7 @@ function MembersList() {
             <li>Entered flat on: {item.StartDate}</li>
             {item.EndDate && <li>Left flat on: {item.EndDate}</li>}
             {!item.EndDate && <li>Still lives in flat!</li>}
-            <li>Bills paid by this member: {item.Paid}</li>
+
             <button onClick={() => navigate(`/editmember/${item.docId}`)}>
               edit
             </button>

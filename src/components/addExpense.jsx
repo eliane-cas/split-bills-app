@@ -14,12 +14,14 @@ const ExpensesListdb = collection(db, "expenses");
 const MembersListdb = collection(db, "members");
 
 const AddExpense = () => {
+  // TODO is it necessary to use state? should i use useEffect?
   const [expense, setExpense] = useState("");
   const [amount, setAmount] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [payers, setPayers] = useState([]);
   const [payer, setPayer] = useState("");
+  const [shares, setShares] = useState({});
 
   // get members from database
   const [storedMembers, setStoredMembers] = useState([]);
@@ -41,6 +43,13 @@ const AddExpense = () => {
   // save expense data to firestore
   const saveDataToFirestore = async (e) => {
     e.preventDefault();
+
+    const calculatedShares = {};
+
+    payers.forEach(async (payer) => {
+      calculatedShares[payer] = amount / payers.length;
+    });
+
     const docRef = await addDoc(ExpensesListdb, {
       Expense: expense,
       Amount: amount,
@@ -48,31 +57,13 @@ const AddExpense = () => {
       EndDate: endDate,
       Payers: payers,
       Payer: payer,
+      Shares: calculatedShares,
     });
     console.log(docRef.id);
     console.log(payer);
+    console.log(payers);
 
     alert("Document written to Database");
-
-    // splitting the bill
-    storedMembers.forEach(async (member) => {
-      if (payers.includes(member.Name)) {
-        console.log(amount / payers.length, member.Name);
-        member.Bills = [
-          ...member.Bills,
-          {
-            billId: docRef.id,
-            totalamount: amount,
-            share: amount / payers.length,
-          },
-        ];
-
-        await updateDoc(doc(db, "members", member.MemberId), {
-          Bills: member.Bills,
-        });
-        console.log(member.Bills);
-      }
-    });
   };
 
   const handleCheckboxChange = (event) => {
@@ -133,18 +124,16 @@ const AddExpense = () => {
           {storedMembers.map((member, index) => (
             <div key={index}>
               <input
+                required
                 type="radio"
                 id={member.Name}
                 name="who paid"
-                value={member.Name}
+                value={member.MemberId}
                 onChange={(event) => {
                   setPayer(event.target.value);
                 }}
               />
-              <label for={member.Name}>
-                {member.MemberId}
-                {member.Name}
-              </label>
+              <label for={member.Name}>{member.Name}</label>
             </div>
           ))}
         </div>
@@ -156,7 +145,7 @@ const AddExpense = () => {
                 type="checkbox"
                 id={member.Name}
                 name={member.Name}
-                value={member.Name}
+                value={member.MemberId}
                 onChange={(event) => {
                   handleCheckboxChange(event);
                 }}
