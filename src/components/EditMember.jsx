@@ -1,7 +1,7 @@
 import fb from "./firebase.js";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 const db = fb.firestore();
 
@@ -58,18 +58,22 @@ function EditMember() {
         <input
           type="date"
           id="startDate"
-          value={startDate}
+          value={startDate.toDate().toLocaleDateString()}
           onChange={(e) => {
-            setStartDate(e.target.value);
+            setStartDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
           }}
         />
         <label for="endDate">Left flat on:</label>
         <input
           type="date"
           id="endDate"
-          value={endDate}
+          value={endDate.toDate().toLocaleDateString()}
           onChange={(e) => {
-            setEndDate(e.target.value);
+            setEndDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
           }}
         />
         <button type="submit">Update member</button>

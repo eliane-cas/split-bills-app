@@ -6,6 +6,7 @@ import {
   collection,
   getDocs,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import "../css/addExpense.css";
 
@@ -107,7 +108,9 @@ const AddExpense = () => {
           id="startDate"
           name="start date"
           onChange={(e) => {
-            setStartDate(e.target.value);
+            setStartDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
           }}
         />
         <label for="endDate">End Date:</label>
@@ -116,7 +119,9 @@ const AddExpense = () => {
           id="endDate"
           name="end date"
           onChange={(e) => {
-            setEndDate(e.target.value);
+            setEndDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
           }}
         />
         <div>

@@ -1,6 +1,6 @@
 import fb from "./firebase";
 import React, { useState, useEffect } from "react";
-import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { getDoc, doc, updateDoc, Timestamp } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 
 const db = fb.firestore();
@@ -75,21 +75,25 @@ function EditExpense() {
           <label for="startDate">Start Date:</label>
           <input
             type="date"
-            value={startDate}
+            value={startDate.toDate().toLocaleDateString()}
             id="startDate"
             name="start date"
             onChange={(e) => {
-              setStartDate(e.target.value);
+              setStartDate(
+                Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+              );
             }}
           />
           <label for="endDate">End Date:</label>
           <input
             type="date"
             id="endDate"
-            value={endDate}
+            value={endDate.toDate().toLocaleDateString()}
             name="end date"
             onChange={(e) => {
-              setEndDate(e.target.value);
+              setEndDate(
+                Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+              );
             }}
           />
 

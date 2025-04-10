@@ -1,6 +1,6 @@
 import fb from "./firebase.js";
 import React, { useState } from "react";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 
 const db = fb.firestore();
 const MembersListdb = collection(db, "members");
@@ -46,7 +46,10 @@ const AddMember = () => {
           id="startDate"
           name="start date"
           onChange={(e) => {
-            setStartDate(e.target.value);
+            setStartDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
+            console.log(startDate);
           }}
         />
         <label for="endDate">Left flat on:</label>
@@ -55,7 +58,9 @@ const AddMember = () => {
           id="endDate"
           name="end date"
           onChange={(e) => {
-            setEndDate(e.target.value);
+            setEndDate(
+              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
+            );
           }}
         />
         <button type="submit">Add member</button>

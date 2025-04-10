@@ -69,8 +69,16 @@ const ExpensesList = () => {
           <div key={index}>
             <li>Expense: {item.Expense}</li>
             <li>Amount: {item.Amount}€</li>
-            {item.StartDate && <li>Bill start date: {item.StartDate}</li>}
-            {item.EndDate && <li>Bill end date: {item.EndDate}</li>}
+            {item.StartDate && (
+              <li>
+                Bill start date: {item.StartDate.toDate().toLocaleDateString()}
+              </li>
+            )}
+            {item.EndDate && (
+              <li>
+                Bill end date: {item.EndDate.toDate().toLocaleDateString()}
+              </li>
+            )}
             {!item.StartDate && !item.EndDate && <li>Bill with no time!</li>}
             <li>Bill paid by {item.Payer}</li>
             <li>Split bill between: {item.Payers.join(" and ")}</li>

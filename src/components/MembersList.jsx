@@ -36,8 +36,14 @@ function MembersList() {
         {storedMembers.map((item, index) => (
           <div key={index}>
             <li>Name: {item.Name}</li>
-            <li>Entered flat on: {item.StartDate}</li>
-            {item.EndDate && <li>Left flat on: {item.EndDate}</li>}
+            <li>
+              Entered flat on: {item.StartDate.toDate().toLocaleDateString()}
+            </li>
+            {item.EndDate && (
+              <li>
+                Left flat on: {item.EndDate.toDate().toLocaleDateString()}
+              </li>
+            )}
             {!item.EndDate && <li>Still lives in flat!</li>}
 
             <button onClick={() => navigate(`/editmember/${item.docId}`)}>
