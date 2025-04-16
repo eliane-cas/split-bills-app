@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import SplittingFunction from "./SplittingFunction";
 import fb from "./firebase";
 
 import {
@@ -65,7 +65,7 @@ const Split = () => {
           delete AmountPaidPerUser[userId];
         })
       );
-      console.log(AmountPaidPerUser);
+      // console.log(AmountPaidPerUser);
       setAmountPaidPerUser(AmountPaidPerUser);
 
       // Calculate what each user owes
@@ -89,7 +89,7 @@ const Split = () => {
         })
       );
       setAmountOwedPerUser(AmountOwedPerUser);
-      console.log(AmountOwedPerUser);
+      // console.log(AmountOwedPerUser);
     };
 
     AmountsPerUser();
@@ -112,6 +112,7 @@ const Split = () => {
           </li>
         ))}
       </div>
+      <SplittingFunction />
     </div>
   );
 };
