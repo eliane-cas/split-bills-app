@@ -89,7 +89,7 @@ const Split = () => {
         })
       );
       setAmountOwedPerUser(AmountOwedPerUser);
-      // console.log(AmountOwedPerUser);
+      console.log(AmountOwedPerUser);
     };
 
     AmountsPerUser();
