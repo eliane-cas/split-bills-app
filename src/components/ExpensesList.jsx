@@ -1,5 +1,5 @@
 import fb from "./firebase";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   getDocs,
   getDoc,
@@ -7,6 +7,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
 
 const db = fb.firestore();
@@ -15,7 +16,13 @@ const ExpensesListdb = collection(db, "expenses");
 const ExpensesList = () => {
   const navigate = useNavigate();
 
-  const [storedExpenses, setStoredExpenses] = useState([]);
+  // const [storedExpenses, setStoredExpenses] = useState([]);
+
+  const { storedExpenses, fetchExpenses, triggerRefresh } =
+    useContext(ExpensesContext);
+
+  // Add usernames to expense data
+  const [parsedExpenses, setParsedExpenses] = useState([]);
 
   const getUserName = async (userId) => {
     const docRef = doc(db, "members", userId);
@@ -24,38 +31,59 @@ const ExpensesList = () => {
     return docSnap.exists() ? docSnap.data().Name : "Unknown User";
   };
 
+  // add names to expense data
   useEffect(() => {
-    const fetchDataFromFirestore = async () => {
-      try {
-        const querySnapshot = await getDocs(ExpensesListdb);
-        // convert firestore data to array + add doc id
-        const expenses = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          expenseId: doc.id,
-        }));
+    const enrichExpensesWithNames = async () => {
+      const enriched = await Promise.all(
+        storedExpenses.map(async (expense) => {
+          const enrichedExpense = { ...expense };
+          enrichedExpense.Payer = await getUserName(expense.Payer);
 
-        // for each expense fetch the name of the payer and the names of the payers
-        await Promise.all(
-          expenses.map(async (expense) => {
-            expense.Payer = await getUserName(expense.Payer);
-
-            if (expense.Payers && Array.isArray(expense.Payers)) {
-              expense.Payers = await Promise.all(
-                expense.Payers.map(
-                  async (payerId) => await getUserName(payerId)
-                )
-              );
-            }
-          })
-        );
-        setStoredExpenses(expenses);
-      } catch (error) {
-        console.error("Error fetching expenses list:", error);
-      }
+          if (expense.Payers && Array.isArray(expense.Payers)) {
+            enrichedExpense.Payers = await Promise.all(
+              expense.Payers.map((payerId) => getUserName(payerId))
+            );
+          }
+          return enrichedExpense;
+        })
+      );
+      setParsedExpenses(enriched);
     };
-    fetchDataFromFirestore();
-    // storedExpenses state as dependency array so it reruns useEffect if we add, delete or modify an expense
+    enrichExpensesWithNames();
   }, [storedExpenses]);
+
+  // useEffect(() => {
+  //   const fetchDataFromFirestore = async () => {
+  //     try {
+  //       const querySnapshot = await getDocs(ExpensesListdb);
+  //       // convert firestore data to array + add doc id
+  //       const expenses = querySnapshot.docs.map((doc) => ({
+  //         ...doc.data(),
+  //         expenseId: doc.id,
+  //       }));
+
+  //       // for each expense fetch the name of the payer and the names of the payers
+  //       await Promise.all(
+  //         expenses.map(async (expense) => {
+  //           expense.Payer = await getUserName(expense.Payer);
+
+  //           if (expense.Payers && Array.isArray(expense.Payers)) {
+  //             expense.Payers = await Promise.all(
+  //               expense.Payers.map(
+  //                 async (payerId) => await getUserName(payerId)
+  //               )
+  //             );
+  //           }
+  //         })
+  //       );
+  //       setStoredExpenses(expenses);
+  //     } catch (error) {
+  //       console.error("Error fetching expenses list:", error);
+  //     }
+  //   };
+  //   fetchDataFromFirestore();
+  //   // storedExpenses state as dependency array so it reruns useEffect if we add, delete or modify an expense
+  // }, [storedExpenses]);
 
   const deleteNumber = async (item) => {
     await deleteDoc(doc(db, "expenses", item.expenseId));
@@ -65,7 +93,7 @@ const ExpensesList = () => {
     <div>
       <h6>Expense List</h6>
       <div>
-        {storedExpenses.map((item, index) => (
+        {parsedExpenses.map((item, index) => (
           <div key={index}>
             <li>Expense: {item.Expense}</li>
             <li>Amount: {item.Amount}€</li>

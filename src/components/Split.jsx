@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import SplittingFunction from "./SplittingFunction";
 import fb from "./firebase";
 
@@ -9,15 +9,18 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
 
 const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 
 const Split = () => {
-  const [storedExpenses, setStoredExpenses] = useState([]);
+  // const [storedExpenses, setStoredExpenses] = useState([]);
+  const { storedExpenses, triggerRefresh } = useContext(ExpensesContext);
   const [AmountPaidPerUser, setAmountPaidPerUser] = useState({});
   const [AmountOwedPerUser, setAmountOwedPerUser] = useState({});
+  const [totalPerUser, setTotalPerUser] = useState({});
 
   const getUserName = async (userId) => {
     const docRef = doc(db, "members", userId);
@@ -26,28 +29,10 @@ const Split = () => {
     return docSnap.exists() ? docSnap.data().Name : "Unknown User";
   };
 
-  useEffect(() => {
-    const fetchExpensesFromFirestore = async () => {
-      try {
-        const querySnapshot = await getDocs(ExpensesListdb);
-        const expenses = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          expenseId: doc.id,
-        }));
-
-        setStoredExpenses(expenses);
-        // console.log(storedExpenses);
-      } catch (error) {
-        console.error("Error fetching expense list:", error);
-      }
-    };
-    fetchExpensesFromFirestore();
-    // console.log(storedExpenses);
-  }, []);
-
+  // CALCULATE AMOUNTS PER USER
   useEffect(() => {
     const AmountsPerUser = async () => {
-      // Calculate what each user has paid
+      // 1. Calculate what each user has paid
       const AmountPaidPerUser = {};
 
       storedExpenses.forEach((expense) => {
@@ -68,7 +53,7 @@ const Split = () => {
       // console.log(AmountPaidPerUser);
       setAmountPaidPerUser(AmountPaidPerUser);
 
-      // Calculate what each user owes
+      // 2. Calculate what each user owes
       const AmountOwedPerUser = {};
 
       storedExpenses.forEach((expense) => {
@@ -91,6 +76,17 @@ const Split = () => {
       setAmountOwedPerUser(AmountOwedPerUser);
       console.log(AmountOwedPerUser);
     };
+
+    // 3. Calculate total for each user
+    const totalPerUser = {};
+    Object.keys(AmountPaidPerUser).forEach((user) => {
+      const paid = AmountPaidPerUser[user] || 0;
+      const owed = AmountOwedPerUser[user] || 0;
+      totalPerUser[user] = paid - owed;
+    });
+
+    setTotalPerUser(totalPerUser);
+    console.log("totals", totalPerUser);
 
     AmountsPerUser();
   }, [storedExpenses]);
