@@ -16,10 +16,9 @@ const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 
 const Split = () => {
-  // const [storedExpenses, setStoredExpenses] = useState([]);
   const { storedExpenses, triggerRefresh } = useContext(ExpensesContext);
-  const [AmountPaidPerUser, setAmountPaidPerUser] = useState({});
-  const [AmountOwedPerUser, setAmountOwedPerUser] = useState({});
+  const [amountPaidPerUser, setAmountPaidPerUser] = useState({});
+  const [amountOwedPerUser, setAmountOwedPerUser] = useState({});
   const [totalPerUser, setTotalPerUser] = useState({});
 
   const getUserName = async (userId) => {
@@ -33,61 +32,59 @@ const Split = () => {
   useEffect(() => {
     const AmountsPerUser = async () => {
       // 1. Calculate what each user has paid
-      const AmountPaidPerUser = {};
+      const localAmountPaidPerUser = {};
 
       storedExpenses.forEach((expense) => {
-        if (!AmountPaidPerUser[expense.Payer]) {
-          AmountPaidPerUser[expense.Payer] = +expense.Amount;
+        if (!localAmountPaidPerUser[expense.Payer]) {
+          localAmountPaidPerUser[expense.Payer] = +expense.Amount;
         } else {
-          AmountPaidPerUser[expense.Payer] += +expense.Amount;
+          localAmountPaidPerUser[expense.Payer] += +expense.Amount;
         }
       });
 
       await Promise.all(
-        Object.entries(AmountPaidPerUser).map(async ([userId, paid]) => {
+        Object.entries(localAmountPaidPerUser).map(async ([userId, paid]) => {
           const memberName = await getUserName(userId);
-          AmountPaidPerUser[memberName] = paid;
-          delete AmountPaidPerUser[userId];
+          localAmountPaidPerUser[memberName] = +paid.toFixed(2);
+          delete localAmountPaidPerUser[userId];
         })
       );
-      // console.log(AmountPaidPerUser);
-      setAmountPaidPerUser(AmountPaidPerUser);
+
+      setAmountPaidPerUser(localAmountPaidPerUser);
 
       // 2. Calculate what each user owes
-      const AmountOwedPerUser = {};
-
+      const localAmountOwedPerUser = {};
       storedExpenses.forEach((expense) => {
         Object.entries(expense.Shares).map(([user, share]) => {
-          if (!AmountOwedPerUser[user]) {
-            AmountOwedPerUser[user] = +share;
+          if (!localAmountOwedPerUser[user]) {
+            localAmountOwedPerUser[user] = +share;
           } else {
-            AmountOwedPerUser[user] += +share;
+            localAmountOwedPerUser[user] += +share;
           }
         });
       });
 
       await Promise.all(
-        Object.entries(AmountOwedPerUser).map(async ([userId, paid]) => {
+        Object.entries(localAmountOwedPerUser).map(async ([userId, paid]) => {
           const memberName = await getUserName(userId);
-          AmountOwedPerUser[memberName] = paid;
-          delete AmountOwedPerUser[userId];
+          localAmountOwedPerUser[memberName] = +paid.toFixed(2);
+          delete localAmountOwedPerUser[userId];
         })
       );
-      setAmountOwedPerUser(AmountOwedPerUser);
-      console.log(AmountOwedPerUser);
+      setAmountOwedPerUser(localAmountOwedPerUser);
+
+      // 3. Calculate total for each user
+
+      const localTotalPerUser = {};
+      Object.keys(localAmountOwedPerUser).forEach((user) => {
+        const paid = localAmountPaidPerUser[user] || 0;
+        const owed = localAmountOwedPerUser[user] || 0;
+        localTotalPerUser[user] = +(paid - owed).toFixed(2);
+      });
+
+      setTotalPerUser(localTotalPerUser);
+      console.log("totals", localTotalPerUser);
     };
-
-    // 3. Calculate total for each user
-    const totalPerUser = {};
-    Object.keys(AmountPaidPerUser).forEach((user) => {
-      const paid = AmountPaidPerUser[user] || 0;
-      const owed = AmountOwedPerUser[user] || 0;
-      totalPerUser[user] = paid - owed;
-    });
-
-    setTotalPerUser(totalPerUser);
-    console.log("totals", totalPerUser);
-
     AmountsPerUser();
   }, [storedExpenses]);
 
@@ -96,19 +93,19 @@ const Split = () => {
       Split
       <div>
         <p>What members have paid</p>
-        {Object.entries(AmountPaidPerUser).map(([user, value]) => (
+        {Object.entries(amountPaidPerUser).map(([user, value]) => (
           <li key={user}>
             {user} has paid {value}€
           </li>
         ))}
         <p>What members owe</p>
-        {Object.entries(AmountOwedPerUser).map(([user, value]) => (
+        {Object.entries(amountOwedPerUser).map(([user, value]) => (
           <li key={user}>
             {user} owes {value}€
           </li>
         ))}
       </div>
-      <SplittingFunction />
+      <SplittingFunction totalPerUser={totalPerUser} />
     </div>
   );
 };
