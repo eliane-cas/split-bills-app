@@ -1,31 +1,31 @@
 import fb from "./firebase";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
+import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
 
 const db = fb.firestore();
 const MembersListdb = collection(db, "members");
 
 function MembersList() {
-  const [storedMembers, setStoredMembers] = useState([]);
-
   const navigate = useNavigate();
 
-  // put inside a use effect to not endelessly fetch the data from firestore ==>
-  const fetchMembersFromFirestore = async () => {
-    const querySnapshot = await getDocs(MembersListdb);
-    const temporaryArr = [];
-    querySnapshot.forEach((doc) => {
-      let tempObj = doc.data();
-      tempObj.docId = doc.id;
-      temporaryArr.push(tempObj);
-    });
-    setStoredMembers(temporaryArr);
+  const { storedMembers, triggerRefresh } = useContext(MembersContext);
+
+  console.log(storedMembers);
+
+  const formatDate = (input) => {
+    if (!input) return "No date";
+
+    // If it's a Firestore Timestamp, convert it to JS Date
+    const date = typeof input.toDate === "function" ? input.toDate() : input;
+
+    // Now it's guaranteed to be a JS Date
+    return date.toISOString().split("T")[0]; // yyyy-mm-dd format
   };
-  fetchMembersFromFirestore();
 
   const deleteMember = async (item) => {
-    await deleteDoc(doc(db, "members", item.docId));
+    await deleteDoc(doc(db, "members", item.memberId));
     console.log("deleted member", item);
   };
 
@@ -36,17 +36,11 @@ function MembersList() {
         {storedMembers.map((item, index) => (
           <div key={index}>
             <li>Name: {item.Name}</li>
-            <li>
-              Entered flat on: {item.StartDate.toDate().toLocaleDateString()}
-            </li>
-            {item.EndDate && (
-              <li>
-                Left flat on: {item.EndDate.toDate().toLocaleDateString()}
-              </li>
-            )}
+            <li>Entered flat on: {formatDate(item.StartDate)}</li>
+            {item.EndDate && <li>Left flat on: {formatDate(item.EndDate)}</li>}
             {!item.EndDate && <li>Still lives in flat!</li>}
 
-            <button onClick={() => navigate(`/editmember/${item.docId}`)}>
+            <button onClick={() => navigate(`/editmember/${item.memberId}`)}>
               edit
             </button>
             <button onClick={() => deleteMember(item)}>delete</button>
