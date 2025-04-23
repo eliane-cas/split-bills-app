@@ -1,39 +1,47 @@
 import fb from "./firebase.js";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { MembersContext } from "../contexts/MembersContext.jsx";
+import {
+  formatDateForInput,
+  parseDateToTimestamp,
+} from "../utilities/dateUtils.jsx";
 
 const db = fb.firestore();
 
 function EditMember() {
   const [name, setName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [startDateStr, setStartDateStr] = useState("");
+  const [endDateStr, setEndDateStr] = useState("");
+  const [endDate, setEndDate] = useState(null);
 
   const navigate = useNavigate();
 
   const { firebaseId } = useParams();
 
+  const { storedMembers, triggerRefresh } = useContext(MembersContext);
+  console.log(storedMembers);
+
   useEffect(() => {
-    const fetchMemberFromFirestore = async () => {
-      const querySnapshot = await getDoc(doc(db, "members", firebaseId));
-
-      const targetObject = querySnapshot.data();
-      console.log("target object", targetObject);
-
-      setName(targetObject.Name);
-      setStartDate(targetObject.StartDate);
-      setEndDate(targetObject.EndDate);
-    };
-    fetchMemberFromFirestore();
-  }, [firebaseId]);
+    const member = storedMembers.find((m) => m.memberId === firebaseId);
+    console.log("member", member);
+    if (member) {
+      setName(member.Name);
+      setStartDate(member.StartDate);
+      setStartDateStr(formatDateForInput(member.StartDate));
+      setEndDate(member.EndDate);
+      setEndDateStr(formatDateForInput(member.EndDate));
+    }
+  }, [firebaseId, storedMembers]);
 
   const updateData = async (e) => {
     e.preventDefault();
     await updateDoc(doc(db, "members", firebaseId), {
       Name: name,
-      StartDate: startDate,
-      EndDate: endDate,
+      StartDate: parseDateToTimestamp(startDateStr),
+      EndDate: parseDateToTimestamp(endDateStr),
     });
     alert("member updated in the database");
   };
@@ -58,22 +66,18 @@ function EditMember() {
         <input
           type="date"
           id="startDate"
-          value={startDate.toDate().toLocaleDateString()}
+          value={startDateStr}
           onChange={(e) => {
-            setStartDate(
-              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
-            );
+            setStartDateStr(e.target.value);
           }}
         />
         <label for="endDate">Left flat on:</label>
         <input
           type="date"
           id="endDate"
-          value={endDate.toDate().toLocaleDateString()}
+          value={endDateStr}
           onChange={(e) => {
-            setEndDate(
-              Timestamp.fromDate(new Date(e.target.value + "T00:00:00"))
-            );
+            setEndDateStr(e.target.value);
           }}
         />
         <button type="submit">Update member</button>

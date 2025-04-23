@@ -5,14 +5,8 @@ const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 const MembersListdb = collection(db, "members");
 
-function SplittingFunction() {
+const SplittingFunction = ({ totalPerUser }) => {
   const [display, setDisplay] = useState([]);
-  const exampleObject = {
-    stef: -11,
-    eliane: 1,
-    ixchel: 7,
-    julia: 3,
-  };
 
   // const exampleArraySorted = [
   //   { Stef: -11 },
@@ -29,14 +23,25 @@ function SplittingFunction() {
     { Gabi: 13 },
   ];
 
-  let arr = [...exampleArraySorted];
-
   useEffect(() => {
-    while (arr.length > 0) {
+    const exampleObject = Object.entries(totalPerUser);
+    const arrE = exampleObject.map(([user, amount]) => ({ [user]: amount }));
+    console.log("example object", exampleObject, arrE);
+    const sorted = arrE.sort((x, y) => {
+      const xValue = Object.values(x)[0];
+      const yValue = Object.values(y)[0];
+      return xValue - yValue;
+    });
+
+    let arr = [...sorted];
+    let newDisplay = [];
+
+    while (arr.length > 1) {
       let [p1] = Object.values(arr[0]);
       let [p2] = Object.values(arr[arr.length - 1]);
-      // console.log(p1, p2);
-
+      p1 = +p1.toFixed(2);
+      p2 = +p2.toFixed(2);
+      console.log(p1, p2);
       if (Math.abs(p1) > Math.abs(p2)) {
         // console.log("p1 bigger than p2", p1, p2);
         let string1 =
@@ -47,7 +52,7 @@ function SplittingFunction() {
           p2 +
           "€";
 
-        display.push(string1);
+        newDisplay.push(string1);
         arr[0][Object.keys(arr[0])[0]] = p1 + p2;
         arr = arr.slice(0, -1); // new array without last element
         continue;
@@ -62,7 +67,7 @@ function SplittingFunction() {
           " " +
           p2 +
           "€";
-        display.push(string2);
+        newDisplay.push(string2);
         arr = arr.slice(1, -1); // new array without first or last element
         continue;
       }
@@ -76,17 +81,15 @@ function SplittingFunction() {
           " " +
           Math.abs(p1) +
           "€";
-        display.push(string3);
+        newDisplay.push(string3);
         arr[arr.length - 1][Object.keys(arr[arr.length - 1])[0]] = p2 + p1;
         arr = arr.slice(1); // new array without first element
         continue;
       }
     }
-    console.log(display);
-    setDisplay(display);
-  }, []);
 
-  console.log(display);
+    setDisplay(newDisplay);
+  }, [totalPerUser]);
 
   return (
     <div>
@@ -99,6 +102,6 @@ function SplittingFunction() {
       <p>This is it!</p>
     </div>
   );
-}
+};
 
 export default SplittingFunction;

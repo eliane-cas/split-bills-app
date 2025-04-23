@@ -1,5 +1,5 @@
 import fb from "./firebase.js";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   doc,
   addDoc,
@@ -9,6 +9,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import "../css/addExpense.css";
+import { MembersContext } from "../contexts/MembersContext.jsx";
 
 const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
@@ -24,22 +25,8 @@ const AddExpense = () => {
   const [payer, setPayer] = useState("");
   const [shares, setShares] = useState({});
 
-  // get members from database
-  const [storedMembers, setStoredMembers] = useState([]);
-
-  const fetchDataFromFirestore = async () => {
-    const querySnapshot = await getDocs(MembersListdb);
-    const temporaryArr = [];
-    querySnapshot.forEach((doc) => {
-      let tempObj = doc.data();
-      tempObj.MemberId = doc.id;
-      temporaryArr.push(tempObj);
-    });
-    setStoredMembers(temporaryArr);
-  };
-  fetchDataFromFirestore();
-
-  // console.log(storedMembers);
+  // get members context
+  const { storedMembers, triggerRefresh } = useContext(MembersContext);
 
   // save expense data to firestore
   const saveDataToFirestore = async (e) => {
@@ -69,6 +56,7 @@ const AddExpense = () => {
 
   const handleCheckboxChange = (event) => {
     const checkedId = event.target.value;
+    console.log(checkedId);
     if (event.target.checked) {
       setPayers([...payers, checkedId]);
     } else {
@@ -133,7 +121,7 @@ const AddExpense = () => {
                 type="radio"
                 id={member.Name}
                 name="who paid"
-                value={member.MemberId}
+                value={member.memberId}
                 onChange={(event) => {
                   setPayer(event.target.value);
                 }}
@@ -150,7 +138,7 @@ const AddExpense = () => {
                 type="checkbox"
                 id={member.Name}
                 name={member.Name}
-                value={member.MemberId}
+                value={member.memberId}
                 onChange={(event) => {
                   handleCheckboxChange(event);
                 }}
