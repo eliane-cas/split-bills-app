@@ -105,6 +105,14 @@ const Split = () => {
           </li>
         ))}
       </div>
+      <div>
+        <p>Totals</p>
+        {Object.entries(totalPerUser).map(([user, value]) => (
+          <li key={user}>
+            {user}: {value}€
+          </li>
+        ))}
+      </div>
       <SplittingFunction totalPerUser={totalPerUser} />
     </div>
   );

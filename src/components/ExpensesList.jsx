@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
+import { formatDateForDisplay } from "../utilities/dateUtils";
 
 const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
@@ -98,14 +99,10 @@ const ExpensesList = () => {
             <li>Expense: {item.Expense}</li>
             <li>Amount: {item.Amount}€</li>
             {item.StartDate && (
-              <li>
-                Bill start date: {item.StartDate.toDate().toLocaleDateString()}
-              </li>
+              <li>Bill start date: {formatDateForDisplay(item.StartDate)}</li>
             )}
             {item.EndDate && (
-              <li>
-                Bill end date: {item.EndDate.toDate().toLocaleDateString()}
-              </li>
+              <li>Bill end date: {formatDateForDisplay(item.EndDate)}</li>
             )}
             {!item.StartDate && !item.EndDate && <li>Bill with no time!</li>}
             <li>Bill paid by {item.Payer}</li>

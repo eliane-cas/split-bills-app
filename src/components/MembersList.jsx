@@ -3,6 +3,7 @@ import React, { useContext, useState } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
 import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
+import { formatDateForDisplay } from "../utilities/dateUtils";
 
 const db = fb.firestore();
 const MembersListdb = collection(db, "members");
@@ -13,16 +14,6 @@ function MembersList() {
   const { storedMembers, triggerRefresh } = useContext(MembersContext);
 
   console.log(storedMembers);
-
-  const formatDate = (input) => {
-    if (!input) return "No date";
-
-    // If it's a Firestore Timestamp, convert it to JS Date
-    const date = typeof input.toDate === "function" ? input.toDate() : input;
-
-    // Now it's guaranteed to be a JS Date
-    return date.toISOString().split("T")[0]; // yyyy-mm-dd format
-  };
 
   const deleteMember = async (item) => {
     await deleteDoc(doc(db, "members", item.memberId));
@@ -36,8 +27,10 @@ function MembersList() {
         {storedMembers.map((item, index) => (
           <div key={index}>
             <li>Name: {item.Name}</li>
-            <li>Entered flat on: {formatDate(item.StartDate)}</li>
-            {item.EndDate && <li>Left flat on: {formatDate(item.EndDate)}</li>}
+            <li>Entered flat on: {formatDateForDisplay(item.StartDate)}</li>
+            {item.EndDate && (
+              <li>Left flat on: {formatDateForDisplay(item.EndDate)}</li>
+            )}
             {!item.EndDate && <li>Still lives in flat!</li>}
 
             <button onClick={() => navigate(`/editmember/${item.memberId}`)}>

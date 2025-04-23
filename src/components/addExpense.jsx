@@ -56,6 +56,7 @@ const AddExpense = () => {
 
   const handleCheckboxChange = (event) => {
     const checkedId = event.target.value;
+    console.log(checkedId);
     if (event.target.checked) {
       setPayers([...payers, checkedId]);
     } else {
@@ -120,7 +121,7 @@ const AddExpense = () => {
                 type="radio"
                 id={member.Name}
                 name="who paid"
-                value={member.MemberId}
+                value={member.memberId}
                 onChange={(event) => {
                   setPayer(event.target.value);
                 }}
@@ -137,7 +138,7 @@ const AddExpense = () => {
                 type="checkbox"
                 id={member.Name}
                 name={member.Name}
-                value={member.MemberId}
+                value={member.memberId}
                 onChange={(event) => {
                   handleCheckboxChange(event);
                 }}
