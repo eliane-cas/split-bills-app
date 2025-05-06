@@ -1,4 +1,4 @@
-import fb from "./firebase.js";
+import { db } from "./firebase.js";
 import React, { useState, useContext } from "react";
 import {
   doc,
@@ -11,7 +11,6 @@ import {
 import "../css/addExpense.css";
 import { MembersContext } from "../contexts/MembersContext.jsx";
 
-const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 const MembersListdb = collection(db, "members");
 

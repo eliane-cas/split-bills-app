@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import SplittingFunction from "./SplittingFunction";
-import fb from "./firebase";
+import { db } from "./firebase";
 
 import {
   getDocs,
@@ -12,7 +12,6 @@ import {
 import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
 
-const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 
 const Split = () => {

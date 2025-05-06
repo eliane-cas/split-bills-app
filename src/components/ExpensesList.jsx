@@ -1,4 +1,4 @@
-import fb from "./firebase";
+import { db } from "./firebase";
 import React, { useEffect, useState, useContext } from "react";
 import {
   getDocs,
@@ -11,7 +11,6 @@ import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
 
-const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 
 const ExpensesList = () => {

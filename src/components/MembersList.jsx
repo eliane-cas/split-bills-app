@@ -1,11 +1,10 @@
-import fb from "./firebase";
+import { db } from "./firebase";
 import React, { useContext, useState } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
 import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
 
-const db = fb.firestore();
 const MembersListdb = collection(db, "members");
 
 function MembersList() {

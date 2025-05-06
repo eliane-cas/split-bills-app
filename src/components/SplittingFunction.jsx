@@ -1,7 +1,7 @@
-import fb from "./firebase";
+import { db } from "./firebase";
 import React, { useState, useEffect } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
-const db = fb.firestore();
+
 const ExpensesListdb = collection(db, "expenses");
 const MembersListdb = collection(db, "members");
 

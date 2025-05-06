@@ -1,8 +1,7 @@
-import fb from "./firebase.js";
+import { db } from "./firebase.js";
 import React, { useState } from "react";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 
-const db = fb.firestore();
 const MembersListdb = collection(db, "members");
 
 const AddMember = () => {

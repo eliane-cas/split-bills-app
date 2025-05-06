@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getDocs, collection } from "firebase/firestore";
-import fb from "../components/firebase";
+import { db } from "../components/firebase";
 
-const db = fb.firestore();
 const ExpensesListdb = collection(db, "expenses");
 
 export const ExpensesContext = createContext();
