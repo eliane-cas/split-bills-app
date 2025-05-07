@@ -26,7 +26,7 @@ function SignUpForm() {
       });
 
       alert("sign up succesful!");
-      navigate("/");
+      navigate("/mygroups");
     } catch (error) {
       console.error("Error signing up:", error);
       alert(error.message);

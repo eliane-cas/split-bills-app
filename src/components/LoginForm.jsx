@@ -17,7 +17,7 @@ function LoginForm() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert("Login succesful!");
-      navigate("/");
+      navigate("/mygroups");
     } catch (error) {
       console.error("Login error:", error);
       alert(error.message);

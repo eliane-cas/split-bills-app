@@ -7,19 +7,11 @@ import { AuthContext } from "../contexts/AuthContext";
 import { auth } from "../components/firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import Logout from "../components/Logout";
 
 function Home() {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/signuplogin");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
 
   return (
     <div>
@@ -27,7 +19,7 @@ function Home() {
       {currentUser ? (
         <>
           <p>Logged in as: {currentUser.email}</p>
-          <button onClick={handleLogout}>Log Out</button>
+          <Logout />
         </>
       ) : (
         <p>You are not logged in.</p>
