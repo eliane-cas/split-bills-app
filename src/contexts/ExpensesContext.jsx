@@ -1,18 +1,23 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../components/firebase";
-
-const ExpensesListdb = collection(db, "expenses");
 
 export const ExpensesContext = createContext();
 
 export const ExpensesProvider = ({ children }) => {
   const [storedExpenses, setStoredExpenses] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [groupId, setGroupId] = useState(null);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = async (groupId) => {
+    if (!groupId) return;
+
     try {
-      const querySnapshot = await getDocs(ExpensesListdb);
+      const q = query(
+        collection(db, "expenses"),
+        where("groupId", "==", groupId)
+      );
+      const querySnapshot = await getDocs(q);
       const expenses = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         expenseId: doc.id,
@@ -26,8 +31,10 @@ export const ExpensesProvider = ({ children }) => {
   const triggerRefresh = () => setRefresh((prev) => !prev);
 
   useEffect(() => {
-    fetchExpenses();
-  }, [refresh]);
+    if (groupId) {
+      fetchExpenses(groupId);
+    }
+  }, [refresh, groupId]);
 
   return (
     <ExpensesContext.Provider
@@ -35,6 +42,7 @@ export const ExpensesProvider = ({ children }) => {
         storedExpenses,
         fetchExpenses,
         triggerRefresh,
+        setGroupId,
       }}
     >
       {children}

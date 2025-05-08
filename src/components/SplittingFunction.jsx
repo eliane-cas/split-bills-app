@@ -2,9 +2,6 @@ import { db } from "./firebase";
 import React, { useState, useEffect } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
 
-const ExpensesListdb = collection(db, "expenses");
-const MembersListdb = collection(db, "members");
-
 const SplittingFunction = ({ totalPerUser }) => {
   const [display, setDisplay] = useState([]);
 

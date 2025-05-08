@@ -18,6 +18,7 @@ import SignUpLoginInPage from "./pages/Login";
 import MyGroups from "./components/MyGroups";
 import CreateGroup from "./components/CreateGroup";
 import JoinGroup from "./components/JoinGroup";
+import GroupHomePage from "./components/GroupHomePage";
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -32,6 +33,7 @@ function App() {
       <Router>
         <Routes>
           {/* PUBLIC ROUTES */}
+          <Route path="/" element={<Home />} />
           <Route path="/signuplogin" element={<SignUpLoginInPage />} />
 
           {/* PRIVATE ROUTES */}
@@ -60,10 +62,10 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/groups/:groupId"
             element={
               <PrivateRoute>
-                <Home />
+                <GroupHomePage />
               </PrivateRoute>
             }
           />
