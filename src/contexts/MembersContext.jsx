@@ -1,20 +1,23 @@
 import { createContext, useEffect, useState } from "react";
-import { getDocs, collection } from "firebase/firestore";
-import fb from "../components/firebase";
-
-const db = fb.firestore();
-const MembersListdb = collection(db, "members");
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "../components/firebase";
 
 export const MembersContext = createContext();
 
 export const MembersProvider = ({ children }) => {
   const [storedMembers, setStoredMembers] = useState([]);
-
   const [refresh, setRefresh] = useState(false);
+  const [groupId, setGroupId] = useState(null);
 
   const fetchMembers = async () => {
+    if (!groupId) return;
+
     try {
-      const querySnapshot = await getDocs(MembersListdb);
+      const q = query(
+        collection(db, "members"),
+        where("groupId", "==", groupId)
+      );
+      const querySnapshot = await getDocs(q);
       const members = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         memberId: doc.id,
@@ -28,12 +31,14 @@ export const MembersProvider = ({ children }) => {
   const triggerRefresh = () => setRefresh((prev) => !prev);
 
   useEffect(() => {
-    fetchMembers();
-  }, [refresh]);
+    if (groupId) {
+      fetchMembers(groupId);
+    }
+  }, [refresh, groupId]);
 
   return (
     <MembersContext.Provider
-      value={{ storedMembers, fetchMembers, triggerRefresh }}
+      value={{ storedMembers, fetchMembers, triggerRefresh, setGroupId }}
     >
       {children}
     </MembersContext.Provider>

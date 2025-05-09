@@ -1,4 +1,4 @@
-import fb from "./firebase";
+import { db } from "./firebase";
 import React, { useState, useEffect, useContext } from "react";
 import { getDoc, doc, updateDoc, Timestamp } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,8 +8,6 @@ import {
   parseDateToTimestamp,
 } from "../utilities/dateUtils.jsx";
 import { MembersContext } from "../contexts/MembersContext.jsx";
-
-const db = fb.firestore();
 
 function EditExpense() {
   const [expense, setExpense] = useState("");

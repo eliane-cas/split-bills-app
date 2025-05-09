@@ -1,4 +1,4 @@
-import fb from "./firebase.js";
+import { db } from "./firebase.js";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
@@ -7,8 +7,6 @@ import {
   formatDateForInput,
   parseDateToTimestamp,
 } from "../utilities/dateUtils.jsx";
-
-const db = fb.firestore();
 
 function EditMember() {
   const [name, setName] = useState("");

@@ -1,4 +1,4 @@
-import fb from "./firebase";
+import { db } from "./firebase";
 import React, { useEffect, useState, useContext } from "react";
 import {
   getDocs,
@@ -11,13 +11,8 @@ import { ExpensesContext } from "../contexts/ExpensesContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
 
-const db = fb.firestore();
-const ExpensesListdb = collection(db, "expenses");
-
 const ExpensesList = () => {
   const navigate = useNavigate();
-
-  // const [storedExpenses, setStoredExpenses] = useState([]);
 
   const { storedExpenses, fetchExpenses, triggerRefresh } =
     useContext(ExpensesContext);
@@ -53,41 +48,9 @@ const ExpensesList = () => {
     enrichExpensesWithNames();
   }, [storedExpenses]);
 
-  // useEffect(() => {
-  //   const fetchDataFromFirestore = async () => {
-  //     try {
-  //       const querySnapshot = await getDocs(ExpensesListdb);
-  //       // convert firestore data to array + add doc id
-  //       const expenses = querySnapshot.docs.map((doc) => ({
-  //         ...doc.data(),
-  //         expenseId: doc.id,
-  //       }));
-
-  //       // for each expense fetch the name of the payer and the names of the payers
-  //       await Promise.all(
-  //         expenses.map(async (expense) => {
-  //           expense.Payer = await getUserName(expense.Payer);
-
-  //           if (expense.Payers && Array.isArray(expense.Payers)) {
-  //             expense.Payers = await Promise.all(
-  //               expense.Payers.map(
-  //                 async (payerId) => await getUserName(payerId)
-  //               )
-  //             );
-  //           }
-  //         })
-  //       );
-  //       setStoredExpenses(expenses);
-  //     } catch (error) {
-  //       console.error("Error fetching expenses list:", error);
-  //     }
-  //   };
-  //   fetchDataFromFirestore();
-  //   // storedExpenses state as dependency array so it reruns useEffect if we add, delete or modify an expense
-  // }, [storedExpenses]);
-
   const deleteNumber = async (item) => {
     await deleteDoc(doc(db, "expenses", item.expenseId));
+    triggerRefresh();
   };
 
   return (

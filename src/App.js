@@ -1,18 +1,99 @@
 import "./css/App.css";
 
+import React, { useContext } from "react";
+import { AuthContext } from "./contexts/AuthContext";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+
+// Components
 import Home from "./pages/Home";
 import EditMember from "./components/EditMember";
 import EditExpense from "./components/EditExpense";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import SignUpLoginInPage from "./pages/Login";
+// import JoinCreateGroup from "./components/JoinCreateGroup";
+import MyGroups from "./components/MyGroups";
+import CreateGroup from "./components/CreateGroup";
+import JoinGroup from "./components/JoinGroup";
+import GroupHomePage from "./components/GroupHomePage";
+import EditGroup from "./components/EditGroup";
+
+const PrivateRoute = ({ children }) => {
+  const { currentUser } = useContext(AuthContext);
+  return currentUser ? children : <Navigate to="/signuplogin" />;
+};
 
 function App() {
+  const { currentUser } = useContext(AuthContext);
+
   return (
     <div className="App">
       <Router>
         <Routes>
+          {/* PUBLIC ROUTES */}
           <Route path="/" element={<Home />} />
-          <Route path="/editmember/:firebaseId" element={<EditMember />} />
-          <Route path="/editexpense/:firebaseId" element={<EditExpense />} />
+          <Route path="/signuplogin" element={<SignUpLoginInPage />} />
+
+          {/* PRIVATE ROUTES */}
+          <Route
+            path="/mygroups"
+            element={
+              <PrivateRoute>
+                <MyGroups />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/joingroup"
+            element={
+              <PrivateRoute>
+                <JoinGroup />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/creategroup"
+            element={
+              <PrivateRoute>
+                <CreateGroup />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/groups/:groupId"
+            element={
+              <PrivateRoute>
+                <GroupHomePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editmember/:firebaseId"
+            element={
+              <PrivateRoute>
+                <EditMember />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editexpense/:firebaseId"
+            element={
+              <PrivateRoute>
+                <EditExpense />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editgroup/:groupId"
+            element={
+              <PrivateRoute>
+                <EditGroup />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
     </div>

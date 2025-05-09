@@ -1,31 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
 import SplittingFunction from "./SplittingFunction";
-import fb from "./firebase";
 
-import {
-  getDocs,
-  getDoc,
-  collection,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
 import { ExpensesContext } from "../contexts/ExpensesContext";
+import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
-
-const db = fb.firestore();
-const ExpensesListdb = collection(db, "expenses");
 
 const Split = () => {
   const { storedExpenses, triggerRefresh } = useContext(ExpensesContext);
+  const { members } = useContext(MembersContext);
+
   const [amountPaidPerUser, setAmountPaidPerUser] = useState({});
   const [amountOwedPerUser, setAmountOwedPerUser] = useState({});
   const [totalPerUser, setTotalPerUser] = useState({});
 
-  const getUserName = async (userId) => {
-    const docRef = doc(db, "members", userId);
-    const docSnap = await getDoc(docRef);
-    // .exists() => make sure doc exists in firestore
-    return docSnap.exists() ? docSnap.data().Name : "Unknown User";
+  const getUserName = (userId) => {
+    const member = members.find((m) => m.id === userId);
+    return member ? member.Name : "Unknown User";
   };
 
   // CALCULATE AMOUNTS PER USER
@@ -42,14 +32,11 @@ const Split = () => {
         }
       });
 
-      await Promise.all(
-        Object.entries(localAmountPaidPerUser).map(async ([userId, paid]) => {
-          const memberName = await getUserName(userId);
-          localAmountPaidPerUser[memberName] = +paid.toFixed(2);
-          delete localAmountPaidPerUser[userId];
-        })
-      );
-
+      Object.entries(localAmountPaidPerUser).map(async ([userId, paid]) => {
+        const memberName = await getUserName(userId);
+        localAmountPaidPerUser[memberName] = +paid.toFixed(2);
+        delete localAmountPaidPerUser[userId];
+      });
       setAmountPaidPerUser(localAmountPaidPerUser);
 
       // 2. Calculate what each user owes
@@ -64,17 +51,14 @@ const Split = () => {
         });
       });
 
-      await Promise.all(
-        Object.entries(localAmountOwedPerUser).map(async ([userId, paid]) => {
-          const memberName = await getUserName(userId);
-          localAmountOwedPerUser[memberName] = +paid.toFixed(2);
-          delete localAmountOwedPerUser[userId];
-        })
-      );
+      Object.entries(localAmountOwedPerUser).map(async ([userId, paid]) => {
+        const memberName = await getUserName(userId);
+        localAmountOwedPerUser[memberName] = +paid.toFixed(2);
+        delete localAmountOwedPerUser[userId];
+      });
       setAmountOwedPerUser(localAmountOwedPerUser);
 
       // 3. Calculate total for each user
-
       const localTotalPerUser = {};
       Object.keys(localAmountOwedPerUser).forEach((user) => {
         const paid = localAmountPaidPerUser[user] || 0;
@@ -86,7 +70,7 @@ const Split = () => {
       console.log("totals", localTotalPerUser);
     };
     AmountsPerUser();
-  }, [storedExpenses]);
+  }, [storedExpenses, members]);
 
   return (
     <div>
