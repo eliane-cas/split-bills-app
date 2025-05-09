@@ -19,6 +19,7 @@ import MyGroups from "./components/MyGroups";
 import CreateGroup from "./components/CreateGroup";
 import JoinGroup from "./components/JoinGroup";
 import GroupHomePage from "./components/GroupHomePage";
+import EditGroup from "./components/EditGroup";
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -82,6 +83,14 @@ function App() {
             element={
               <PrivateRoute>
                 <EditExpense />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/editgroup/:groupId"
+            element={
+              <PrivateRoute>
+                <EditGroup />
               </PrivateRoute>
             }
           />
