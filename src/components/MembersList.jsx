@@ -4,13 +4,13 @@ import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
 import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
-
-const MembersListdb = collection(db, "members");
+import { AuthContext } from "../contexts/AuthContext";
 
 function MembersList() {
   const navigate = useNavigate();
-
   const { storedMembers, triggerRefresh } = useContext(MembersContext);
+  const { currentUser } = useContext(AuthContext);
+  console.log(currentUser.uid);
 
   console.log(storedMembers);
 
@@ -25,7 +25,10 @@ function MembersList() {
       <div>
         {storedMembers.map((item, index) => (
           <div key={index}>
-            <li>Name: {item.Name}</li>
+            <li>
+              Name: {item.Name}
+              {item.linkedUser === currentUser.uid && <b> (me!)</b>}
+            </li>
             <li>Entered flat on: {formatDateForDisplay(item.StartDate)}</li>
             {item.EndDate && (
               <li>Left flat on: {formatDateForDisplay(item.EndDate)}</li>

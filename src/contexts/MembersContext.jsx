@@ -4,42 +4,37 @@ import { db } from "../components/firebase";
 
 export const MembersContext = createContext();
 
-export const MembersProvider = ({ children }) => {
+export const MembersProvider = ({ children, activeGroupId }) => {
   const [storedMembers, setStoredMembers] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [groupId, setGroupId] = useState(null);
 
-  const fetchMembers = async () => {
-    if (!groupId) return;
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!activeGroupId) return;
 
-    try {
-      const q = query(
-        collection(db, "members"),
-        where("groupId", "==", groupId)
-      );
-      const querySnapshot = await getDocs(q);
-      const members = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        memberId: doc.id,
-      }));
-      setStoredMembers(members);
-    } catch (error) {
-      console.error("Error fetching members list:", error);
-    }
-  };
+      try {
+        const q = query(
+          collection(db, "members"),
+          where("groupId", "==", activeGroupId)
+        );
+        const querySnapshot = await getDocs(q);
+        const members = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          memberId: doc.id,
+        }));
+        setStoredMembers(members);
+      } catch (error) {
+        console.error("Error fetching members list:", error);
+      }
+    };
+    setStoredMembers([]);
+    fetchMembers();
+  }, [activeGroupId]);
 
   const triggerRefresh = () => setRefresh((prev) => !prev);
 
-  useEffect(() => {
-    if (groupId) {
-      fetchMembers(groupId);
-    }
-  }, [refresh, groupId]);
-
   return (
-    <MembersContext.Provider
-      value={{ storedMembers, fetchMembers, triggerRefresh, setGroupId }}
-    >
+    <MembersContext.Provider value={{ storedMembers, triggerRefresh }}>
       {children}
     </MembersContext.Provider>
   );

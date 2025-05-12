@@ -5,18 +5,14 @@ import Logout from "../components/Logout";
 import GroupInfo from "./GroupInfo";
 
 import React, { useContext, useEffect, useState } from "react";
-import { getDoc, doc, collection, getDocs } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 import { db } from "../components/firebase";
-import { AuthContext } from "../contexts/AuthContext";
-import { useParams, useNavigate } from "react-router-dom";
-import { ExpensesContext } from "../contexts/ExpensesContext";
-import { MembersContext } from "../contexts/MembersContext";
 
-function GroupHomePage() {
+import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+function GroupHomePage({ groupId }) {
   const { currentUser } = useContext(AuthContext);
-  const { groupId } = useParams();
-  const { setGroupId: setExpensesGroupId } = useContext(ExpensesContext);
-  const { setGroupId: setMembersGroupId } = useContext(MembersContext);
 
   const navigate = useNavigate();
 
@@ -41,13 +37,6 @@ function GroupHomePage() {
     fetchGroupInfo();
   }, [groupId]);
 
-  useEffect(() => {
-    if (groupId) {
-      setExpensesGroupId(groupId);
-      setMembersGroupId(groupId);
-    }
-  }, [groupId]);
-
   return (
     <div>
       <header>Split Bills App</header>
@@ -65,7 +54,7 @@ function GroupHomePage() {
       <GroupInfo />
       <Members />
       <Expenses />
-      <Split groupId={groupId} />
+      <Split />
     </div>
   );
 }

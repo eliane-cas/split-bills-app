@@ -10,6 +10,8 @@ import {
 } from "firebase/firestore";
 import "../css/addExpense.css";
 import { MembersContext } from "../contexts/MembersContext.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import { ExpensesContext } from "../contexts/ExpensesContext.jsx";
 
 const ExpensesListdb = collection(db, "expenses");
 const MembersListdb = collection(db, "members");
@@ -23,9 +25,13 @@ const AddExpense = () => {
   const [payers, setPayers] = useState([]);
   const [payer, setPayer] = useState("");
   const [shares, setShares] = useState({});
+  const { groupId } = useParams();
+
+  // get refresh
+  const { triggerRefresh } = useContext(ExpensesContext);
 
   // get members context
-  const { storedMembers, triggerRefresh } = useContext(MembersContext);
+  const { storedMembers } = useContext(MembersContext);
 
   // save expense data to firestore
   const saveDataToFirestore = async (e) => {
@@ -45,11 +51,12 @@ const AddExpense = () => {
       Payers: payers,
       Payer: payer,
       Shares: calculatedShares,
+      groupId: groupId,
     });
     console.log(docRef.id);
     console.log(payer);
     console.log(payers);
-
+    triggerRefresh();
     alert("Document written to Database");
   };
 

@@ -29,7 +29,7 @@ function MyGroups() {
             const docRef = doc(db, "groups", groupId);
             const docSnap = await getDoc(docRef);
 
-            if (!docSnap.exists()) return;
+            if (!docSnap.exists()) return null;
             return { id: groupId, ...docSnap.data() };
           })
         );

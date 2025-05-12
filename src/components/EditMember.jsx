@@ -14,6 +14,7 @@ function EditMember() {
   const [startDateStr, setStartDateStr] = useState("");
   const [endDateStr, setEndDateStr] = useState("");
   const [endDate, setEndDate] = useState(null);
+  const [groupId, setGroupId] = useState("");
 
   const navigate = useNavigate();
 
@@ -31,6 +32,7 @@ function EditMember() {
       setStartDateStr(formatDateForInput(member.StartDate));
       setEndDate(member.EndDate);
       setEndDateStr(formatDateForInput(member.EndDate));
+      setGroupId(member.groupId);
     }
   }, [firebaseId, storedMembers]);
 
@@ -41,6 +43,7 @@ function EditMember() {
       StartDate: parseDateToTimestamp(startDateStr),
       EndDate: parseDateToTimestamp(endDateStr),
     });
+    triggerRefresh();
     alert("member updated in the database");
   };
 
@@ -79,7 +82,9 @@ function EditMember() {
           }}
         />
         <button type="submit">Update member</button>
-        <button onClick={() => navigate("/")}>go to homepage</button>
+        <button onClick={() => navigate(`/groups/${groupId}`)}>
+          go to homepage
+        </button>
       </form>
     </>
   );

@@ -7,19 +7,27 @@ import { useNavigate } from "react-router-dom";
 
 const Split = () => {
   const { storedExpenses, triggerRefresh } = useContext(ExpensesContext);
-  const { members } = useContext(MembersContext);
+  const { storedMembers } = useContext(MembersContext);
 
   const [amountPaidPerUser, setAmountPaidPerUser] = useState({});
   const [amountOwedPerUser, setAmountOwedPerUser] = useState({});
   const [totalPerUser, setTotalPerUser] = useState({});
 
   const getUserName = (userId) => {
-    const member = members.find((m) => m.id === userId);
+    const member = storedMembers.find((m) => m.memberId === userId);
+    console.log("getUserName called for:", userId, "Found member:", member);
+
     return member ? member.Name : "Unknown User";
   };
 
+  console.log("stored storedMembers", storedMembers);
+  console.log(" expenses", storedExpenses);
+
   // CALCULATE AMOUNTS PER USER
   useEffect(() => {
+    if (!storedMembers || !storedExpenses) return;
+    if (storedMembers.length === 0 || storedExpenses.length === 0) return;
+
     const AmountsPerUser = async () => {
       // 1. Calculate what each user has paid
       const localAmountPaidPerUser = {};
@@ -32,12 +40,13 @@ const Split = () => {
         }
       });
 
-      Object.entries(localAmountPaidPerUser).map(async ([userId, paid]) => {
-        const memberName = await getUserName(userId);
-        localAmountPaidPerUser[memberName] = +paid.toFixed(2);
-        delete localAmountPaidPerUser[userId];
-      });
-      setAmountPaidPerUser(localAmountPaidPerUser);
+      const paidWithNames = {};
+      for (const [userId, paid] of Object.entries(localAmountPaidPerUser)) {
+        const memberName = getUserName(userId);
+        paidWithNames[memberName] = +paid.toFixed(2);
+      }
+
+      setAmountPaidPerUser(paidWithNames);
 
       // 2. Calculate what each user owes
       const localAmountOwedPerUser = {};
@@ -51,18 +60,25 @@ const Split = () => {
         });
       });
 
-      Object.entries(localAmountOwedPerUser).map(async ([userId, paid]) => {
-        const memberName = await getUserName(userId);
-        localAmountOwedPerUser[memberName] = +paid.toFixed(2);
-        delete localAmountOwedPerUser[userId];
-      });
-      setAmountOwedPerUser(localAmountOwedPerUser);
+      const owedWithNames = {};
+      for (const [userId, owed] of Object.entries(localAmountOwedPerUser)) {
+        const memberName = getUserName(userId);
+        owedWithNames[memberName] = +owed.toFixed(2);
+      }
+
+      setAmountOwedPerUser(owedWithNames);
+
+      // get all users
+      const allUsers = new Set([
+        ...Object.keys(paidWithNames),
+        ...Object.keys(owedWithNames),
+      ]);
 
       // 3. Calculate total for each user
       const localTotalPerUser = {};
-      Object.keys(localAmountOwedPerUser).forEach((user) => {
-        const paid = localAmountPaidPerUser[user] || 0;
-        const owed = localAmountOwedPerUser[user] || 0;
+      allUsers.forEach((user) => {
+        const paid = paidWithNames[user] || 0;
+        const owed = owedWithNames[user] || 0;
         localTotalPerUser[user] = +(paid - owed).toFixed(2);
       });
 
@@ -70,7 +86,7 @@ const Split = () => {
       console.log("totals", localTotalPerUser);
     };
     AmountsPerUser();
-  }, [storedExpenses, members]);
+  }, [storedExpenses, storedMembers]);
 
   return (
     <div>

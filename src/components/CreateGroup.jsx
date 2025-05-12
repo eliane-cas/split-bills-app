@@ -4,6 +4,7 @@ import {
   doc,
   collection,
   setDoc,
+  addDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
@@ -16,6 +17,7 @@ function CreateGroup() {
   const [newGroupDescription, setNewGroupDescription] = useState("");
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
+  const [name, setName] = useState("");
 
   const handleCreateGroup = async (e) => {
     e.preventDefault();
@@ -23,8 +25,7 @@ function CreateGroup() {
     const inviteCode = uuidv4().slice(0, 8);
 
     try {
-      const newGroupRef = doc(collection(db, "groups"));
-      await setDoc(newGroupRef, {
+      const docRef = await addDoc(collection(db, "groups"), {
         name: newGroupName,
         description: newGroupDescription,
         createdBy: currentUser.uid,
@@ -33,11 +34,17 @@ function CreateGroup() {
         inviteCode: inviteCode,
       });
 
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        joinedGroups: arrayUnion(newGroupRef.id),
+      await addDoc(collection(db, "members"), {
+        Name: name,
+        groupId: docRef.id,
+        linkedUser: currentUser.uid,
       });
 
-      navigate(`/groups/${newGroupRef.id}`);
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        joinedGroups: arrayUnion(docRef.id),
+      });
+
+      navigate(`/groups/${docRef.id}`);
     } catch (error) {
       console.error("Error creating group:", error);
       alert("An error occurred while creating the group. Please try again.");
@@ -46,7 +53,7 @@ function CreateGroup() {
 
   return (
     <div>
-      <form onSubmit={handleCreateGroup}>
+      <form onSubmit={handleCreateGroup} className="expense-form">
         <h2>Create a New Group</h2>
         <input
           type="text"
@@ -59,6 +66,15 @@ function CreateGroup() {
           placeholder="Group description"
           value={newGroupDescription}
           onChange={(e) => setNewGroupDescription(e.target.value)}
+        />
+        <label>Your name in this group:</label>
+        <input
+          required
+          type="text"
+          placeholder="your name"
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
         />
         <button type="submit">Create Group</button>
       </form>

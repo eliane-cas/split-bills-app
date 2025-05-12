@@ -1,6 +1,8 @@
 import { db } from "./firebase.js";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { useNavigate, useParams } from "react-router-dom";
+import { MembersContext } from "../contexts/MembersContext.jsx";
 
 const MembersListdb = collection(db, "members");
 
@@ -8,6 +10,9 @@ const AddMember = () => {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const { groupId } = useParams();
+
+  const { triggerRefresh } = useContext(MembersContext);
 
   const saveDataToFirestore = async (e) => {
     e.preventDefault();
@@ -15,9 +20,10 @@ const AddMember = () => {
       Name: name,
       StartDate: startDate,
       EndDate: endDate,
-
       Paid: [],
+      groupId: groupId,
     });
+    triggerRefresh();
     alert("member added to the database");
   };
 

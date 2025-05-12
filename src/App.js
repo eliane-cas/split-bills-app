@@ -14,12 +14,12 @@ import Home from "./pages/Home";
 import EditMember from "./components/EditMember";
 import EditExpense from "./components/EditExpense";
 import SignUpLoginInPage from "./pages/Login";
-// import JoinCreateGroup from "./components/JoinCreateGroup";
 import MyGroups from "./components/MyGroups";
 import CreateGroup from "./components/CreateGroup";
 import JoinGroup from "./components/JoinGroup";
 import GroupHomePage from "./components/GroupHomePage";
 import EditGroup from "./components/EditGroup";
+import GroupHomePageWrapper from "./components/GroupHomePageWrapper";
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -66,7 +66,7 @@ function App() {
             path="/groups/:groupId"
             element={
               <PrivateRoute>
-                <GroupHomePage />
+                <GroupHomePageWrapper />
               </PrivateRoute>
             }
           />

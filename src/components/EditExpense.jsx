@@ -17,8 +17,8 @@ function EditExpense() {
   const [endDate, setEndDate] = useState(null);
   const [endDateStr, setEndDateStr] = useState("");
   const [payer, setPayer] = useState("");
-
   const [payers, setPayers] = useState([]);
+  const [groupId, setGroupId] = useState("");
 
   const navigate = useNavigate();
 
@@ -42,6 +42,7 @@ function EditExpense() {
       setEndDateStr(formatDateForInput(bill.EndDate));
       setPayer(bill.Payer);
       setPayers(bill.Payers);
+      setGroupId(bill.groupId);
     }
   }, [firebaseId, storedExpenses]);
 
@@ -71,6 +72,7 @@ function EditExpense() {
       Payers: payers,
       Shares: calculatedShares,
     });
+    triggerRefresh();
     alert("expense updated in the database");
   };
 
@@ -161,7 +163,9 @@ function EditExpense() {
           </div>
 
           <button type="submit">Update this Expense</button>
-          <button onClick={() => navigate("/")}>go to homepage</button>
+          <button onClick={() => navigate(`/groups/${groupId}`)}>
+            go to homepage
+          </button>
         </form>
       </div>
     </div>

@@ -4,45 +4,45 @@ import { db } from "../components/firebase";
 
 export const ExpensesContext = createContext();
 
-export const ExpensesProvider = ({ children }) => {
+export const ExpensesProvider = ({ children, activeGroupId }) => {
   const [storedExpenses, setStoredExpenses] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [groupId, setGroupId] = useState(null);
 
-  const fetchExpenses = async (groupId) => {
-    if (!groupId) return;
+  useEffect(
+    () => {
+      const fetchExpenses = async () => {
+        if (!activeGroupId) return;
 
-    try {
-      const q = query(
-        collection(db, "expenses"),
-        where("groupId", "==", groupId)
-      );
-      const querySnapshot = await getDocs(q);
-      const expenses = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        expenseId: doc.id,
-      }));
-      setStoredExpenses(expenses);
-    } catch (error) {
-      console.error("Error fetching expense list:", error);
-    }
-  };
+        try {
+          setStoredExpenses([]);
+          const q = query(
+            collection(db, "expenses"),
+            where("groupId", "==", activeGroupId)
+          );
+          const querySnapshot = await getDocs(q);
+          const expenses = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            expenseId: doc.id,
+          }));
+          setStoredExpenses(expenses);
+        } catch (error) {
+          console.error("Error fetching expense list:", error);
+        }
+      };
+      fetchExpenses();
+    },
+    activeGroupId,
+    refresh
+  );
 
   const triggerRefresh = () => setRefresh((prev) => !prev);
-
-  useEffect(() => {
-    if (groupId) {
-      fetchExpenses(groupId);
-    }
-  }, [refresh, groupId]);
 
   return (
     <ExpensesContext.Provider
       value={{
         storedExpenses,
-        fetchExpenses,
+
         triggerRefresh,
-        setGroupId,
       }}
     >
       {children}
