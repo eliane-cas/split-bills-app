@@ -36,6 +36,7 @@ function GroupInfo() {
         <>
           <h2>Welcome to: {groupInfo.name}</h2>
           <p>description: {groupInfo.description}</p>
+          <p>Share code: {groupInfo.inviteCode}</p>
           <button onClick={() => navigate(`/editgroup/${groupInfo.id}`)}>
             edit group
           </button>

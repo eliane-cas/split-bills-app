@@ -20,7 +20,7 @@ const AddMember = () => {
       Name: name,
       StartDate: startDate,
       EndDate: endDate,
-      Paid: [],
+      linkedUser: null,
       groupId: groupId,
     });
     triggerRefresh();

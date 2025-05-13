@@ -1,6 +1,12 @@
 import { db } from "./firebase";
 import React, { useContext, useState } from "react";
-import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
@@ -19,6 +25,19 @@ function MembersList() {
     console.log("deleted member", item);
   };
 
+  const claimMember = async (item) => {
+    await updateDoc(doc(db, "members", item.memberId), {
+      linkedUser: currentUser.uid,
+    });
+    alert("Member claimed!");
+  };
+
+  const userHasClaimedMember = storedMembers.some(
+    (m) => m.linkedUser === currentUser.uid
+  );
+  console.log(userHasClaimedMember);
+  console.log(currentUser);
+
   return (
     <div>
       <h6>Members List</h6>
@@ -27,7 +46,14 @@ function MembersList() {
           <div key={index}>
             <li>
               Name: {item.Name}
-              {item.linkedUser === currentUser.uid && <b> (me!)</b>}
+              {item.linkedUser === currentUser.uid ? (
+                <b> (me!)</b>
+              ) : item.linkedUser !== null &&
+                item.linkedUser !== currentUser.uid ? (
+                <b> claimed!</b>
+              ) : !userHasClaimedMember ? (
+                <button onClick={() => claimMember(item)}>claim</button>
+              ) : null}
             </li>
             <li>Entered flat on: {formatDateForDisplay(item.StartDate)}</li>
             {item.EndDate && (

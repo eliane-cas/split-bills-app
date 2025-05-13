@@ -2,14 +2,25 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../components/Logout";
 import { AuthContext } from "../contexts/AuthContext";
-import { getDoc, doc, collection, getDocs } from "firebase/firestore";
+import {
+  getDoc,
+  doc,
+  collection,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  query,
+  where,
+  arrayRemove,
+} from "firebase/firestore";
 import { db } from "../components/firebase";
+import { useLocation } from "react-router-dom";
 
 function MyGroups() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const [myGroups, setMyGroups] = useState([]);
-
+  const location = useLocation();
   useEffect(() => {
     const fetchJoinedGroups = async () => {
       if (!currentUser) return;
@@ -40,7 +51,63 @@ function MyGroups() {
       }
     };
     fetchJoinedGroups();
-  }, [currentUser]);
+  }, [currentUser, location.key]);
+
+  const deleteGroup = async (groupId) => {
+    const confirm = window.confirm(
+      "⚠️ You are about to delete this group for ALL members. Proceed?"
+    );
+    if (!confirm) return;
+
+    try {
+      // delete expenses from group
+      const expensesQuery = query(
+        collection(db, "expenses"),
+        where("groupId", "==", groupId)
+      );
+      const expensesSnap = await getDocs(expensesQuery);
+      const expensesDelete = expensesSnap.docs.map((docSnap) =>
+        deleteDoc(doc(db, "expenses", docSnap.id))
+      );
+
+      // delete members from group
+      const membersQuery = query(
+        collection(db, "members"),
+        where("groupId", "==", groupId)
+      );
+      const membersSnap = await getDocs(membersQuery);
+      const membersDelete = membersSnap.docs.map((docSnap) =>
+        deleteDoc(doc(db, "members", docSnap.id))
+      );
+
+      // remove group from users' joined groups array // CHECK IF THIS WORKS
+      const userUpdates = membersSnap.docs.map(async (docSnap) => {
+        const userData = docSnap.data();
+        const userId = userData.linkedUser;
+        console.log(userId, "userId");
+        if (!userId) return;
+
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+          joinedGroups: arrayRemove(groupId),
+        });
+      });
+
+      // delete group document
+      const groupRef = doc(db, "groups", groupId);
+      const groupDelete = deleteDoc(groupRef);
+
+      await Promise.all([
+        ...expensesDelete,
+        ...membersDelete,
+        ...userUpdates,
+        groupDelete,
+      ]);
+      alert("Group and all related data succesfully deleted");
+    } catch (error) {
+      console.error("Error deleting group and related data: ", error);
+    }
+  };
 
   console.log(myGroups);
 
@@ -66,6 +133,9 @@ function MyGroups() {
               <p>{group.description}</p>
               <button onClick={() => navigate(`/groups/${group.id}`)}>
                 Go to group
+              </button>
+              <button onClick={() => deleteGroup(group.id)}>
+                Delete group
               </button>
             </li>
           ))}

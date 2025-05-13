@@ -1,6 +1,16 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  query,
+  where,
+  getDocs,
+  collection,
+} from "firebase/firestore";
 import { db } from "./firebase";
 import { AuthContext } from "../contexts/AuthContext";
 import { v4 as uuidv4 } from "uuid"; // create unique ids
@@ -13,16 +23,27 @@ function JoinGroup() {
   const handleJoinGroup = async () => {
     if (!joinCode) return alert("Please enter group code");
 
-    const groupRef = doc(db, "groups", joinCode);
-    const groupSnap = await getDoc(groupRef);
+    const q = query(
+      collection(db, "groups"),
+      where("inviteCode", "==", joinCode)
+    );
 
-    if (!groupSnap.exists()) {
-      return "No group found with this code";
+    const querySnapshot = await getDocs(q);
+    let groupId;
+    if (!querySnapshot.empty) {
+      const groupDoc = querySnapshot.docs[0];
+      const groupData = groupDoc.data();
+      groupId = groupDoc.id;
+      console.log("Group found:", groupData);
+    } else {
+      console.log("No group found with that invite code.");
     }
 
     await updateDoc(doc(db, "users", currentUser.uid), {
-      joinedGroups: arrayUnion(joinCode),
+      joinedGroups: arrayUnion(groupId),
     });
+
+    navigate(`/groups/${groupId}`);
   };
 
   return (
