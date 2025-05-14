@@ -8,6 +8,8 @@ export const MembersProvider = ({ children, activeGroupId }) => {
   const [storedMembers, setStoredMembers] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
+  const triggerRefresh = () => setRefresh((prev) => !prev);
+
   useEffect(() => {
     const fetchMembers = async () => {
       if (!activeGroupId) return;
@@ -29,9 +31,7 @@ export const MembersProvider = ({ children, activeGroupId }) => {
     };
     setStoredMembers([]);
     fetchMembers();
-  }, [activeGroupId]);
-
-  const triggerRefresh = () => setRefresh((prev) => !prev);
+  }, [activeGroupId, refresh]);
 
   return (
     <MembersContext.Provider value={{ storedMembers, triggerRefresh }}>

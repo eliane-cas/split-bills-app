@@ -11,7 +11,8 @@ import {
 
 // Components
 import Home from "./pages/Home";
-import EditMember from "./components/EditMember";
+import EditMemberWrapper from "./wrappers/EditMemberWrapper";
+import EditExpenseWrapper from "./wrappers/EditExpenseWrapper";
 import EditExpense from "./components/EditExpense";
 import SignUpLoginInPage from "./pages/Login";
 import MyGroups from "./components/MyGroups";
@@ -19,7 +20,7 @@ import CreateGroup from "./components/CreateGroup";
 import JoinGroup from "./components/JoinGroup";
 import GroupHomePage from "./components/GroupHomePage";
 import EditGroup from "./components/EditGroup";
-import GroupHomePageWrapper from "./components/GroupHomePageWrapper";
+import GroupHomePageWrapper from "./wrappers/GroupHomePageWrapper";
 
 const PrivateRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -71,18 +72,18 @@ function App() {
             }
           />
           <Route
-            path="/editmember/:firebaseId"
+            path="/groups/:groupId/editmember/:firebaseId"
             element={
               <PrivateRoute>
-                <EditMember />
+                <EditMemberWrapper />
               </PrivateRoute>
             }
           />
           <Route
-            path="/editexpense/:firebaseId"
+            path="/groups/:groupId/editexpense/:firebaseId"
             element={
               <PrivateRoute>
-                <EditExpense />
+                <EditExpenseWrapper />
               </PrivateRoute>
             }
           />

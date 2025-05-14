@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { ExpensesProvider } from "../contexts/ExpensesContext";
 import { MembersProvider } from "../contexts/MembersContext";
-import GroupHomePage from "./GroupHomePage";
+import GroupHomePage from "../components/GroupHomePage";
 
 const GroupHomePageWrapper = () => {
   const { groupId } = useParams();

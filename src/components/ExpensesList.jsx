@@ -8,11 +8,12 @@ import {
   doc,
 } from "firebase/firestore";
 import { ExpensesContext } from "../contexts/ExpensesContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
 
 const ExpensesList = () => {
   const navigate = useNavigate();
+  const { groupId } = useParams();
 
   const { storedExpenses, fetchExpenses, triggerRefresh } =
     useContext(ExpensesContext);
@@ -70,9 +71,14 @@ const ExpensesList = () => {
             {!item.StartDate && !item.EndDate && <li>Bill with no time!</li>}
             <li>Bill paid by {item.Payer}</li>
             <li>Split bill between: {item.Payers.join(" and ")}</li>
-            <button onClick={() => navigate(`/editexpense/${item.expenseId}`)}>
+            <button
+              onClick={() =>
+                navigate(`/groups/${groupId}/editexpense/${item.expenseId}`)
+              }
+            >
               edit
             </button>
+
             <button onClick={() => deleteNumber(item)}>delete</button>
             <hr></hr>
           </div>

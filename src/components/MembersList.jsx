@@ -11,11 +11,14 @@ import { MembersContext } from "../contexts/MembersContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateForDisplay } from "../utilities/dateUtils";
 import { AuthContext } from "../contexts/AuthContext";
+import { useParams } from "react-router-dom";
 
 function MembersList() {
   const navigate = useNavigate();
   const { storedMembers, triggerRefresh } = useContext(MembersContext);
   const { currentUser } = useContext(AuthContext);
+
+  const { groupId } = useParams();
   console.log(currentUser.uid);
 
   console.log(storedMembers);
@@ -61,8 +64,12 @@ function MembersList() {
             )}
             {!item.EndDate && <li>Still lives in flat!</li>}
 
-            <button onClick={() => navigate(`/editmember/${item.memberId}`)}>
-              edit
+            <button
+              onClick={() =>
+                navigate(`/groups/${groupId}/editmember/${item.memberId}`)
+              }
+            >
+              Edit
             </button>
             <button onClick={() => deleteMember(item)}>delete</button>
             <hr></hr>

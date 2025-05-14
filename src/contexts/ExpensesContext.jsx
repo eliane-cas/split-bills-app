@@ -8,6 +8,8 @@ export const ExpensesProvider = ({ children, activeGroupId }) => {
   const [storedExpenses, setStoredExpenses] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
+  const triggerRefresh = () => setRefresh((prev) => !prev);
+
   useEffect(
     () => {
       const fetchExpenses = async () => {
@@ -34,8 +36,6 @@ export const ExpensesProvider = ({ children, activeGroupId }) => {
     activeGroupId,
     refresh
   );
-
-  const triggerRefresh = () => setRefresh((prev) => !prev);
 
   return (
     <ExpensesContext.Provider
